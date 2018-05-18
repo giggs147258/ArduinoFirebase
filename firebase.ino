@@ -7,7 +7,7 @@
 int myOutput = D2;
 int myOutput2 = D8;
 int myDelay = 1000;//ค่าของเวลาจะมีหน่วยเป็น มิลลิวินาที
-//int intIndex = 0;
+int intIndex = 0;
 int intSwitch = 0;
 int intSwitch2 = 0;
 
@@ -65,7 +65,7 @@ void loop() {
 //  delay(2000);
 
 //Check Connected Firebase
-  //Firebase.setInt("led", intIndex);
+  Firebase.setInt("index", intIndex);
   
   if (Firebase.failed()) {
 
@@ -77,11 +77,11 @@ void loop() {
     }
 
     Serial.print("Success Connected Firebase Times ==>\n");
-    //Serial.println(Firebase.getInt("led"));
+    Serial.println(Firebase.getInt("led"));
 
-    //intIndex = Firebase.getInt("led");
+    intIndex = Firebase.getInt("index");
 
-    //intIndex++;
+    intIndex++;
 
   intSwitch = Firebase.getInt("Switch1/LED1");
 

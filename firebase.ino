@@ -4,20 +4,23 @@
 #include <FirebaseArduino.h>
 
 //Explicit ประกาศตัวแปร
-int myOutput = D2;
-int myOutput2 = D8;
+int led1 = D5;
+int led2 = D6;
 int myDelay = 1000;//ค่าของเวลาจะมีหน่วยเป็น มิลลิวินาที
 int intIndex = 0;
 int intSwitch = 0;
 int intSwitch2 = 0;
+int smoke = A0;
+int sensorThres = 0;
+int ledSmoke = D4;
 
 //การกำหนดค่าคงที
 #define wifiSSID "Kik"    //String wifiSSID="";
 #define wifiPassword "12345678"
 //-------------------------------------------------
 //การทำงานบนfirebase
-#define firebaseHost "fir-4950a.firebaseio.com"//"supawadeenodemcu.firebaseio.com"
-#define firebaseKey "udAL17fOlK9jFO1lLyqd4ylv5gf8s4B1VbqunqGp"
+#define firebaseHost "kornchrismas.firebaseio.com"
+#define firebaseKey "MBs1mOgX357Bf0egUqd8YMuhjNJEp8Ula6Fw6iHb"
 //-------------------------------------------------
 
 
@@ -27,8 +30,11 @@ int intSwitch2 = 0;
 void setup() {
 
   //  ส่วนที่กำหนดการส่งสัญญาณ digital Out จากขาของ Node
-  pinMode(myOutput, OUTPUT);
-  pinMode(myOutput2, OUTPUT);
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(smoke, INPUT);
+
+  pinMode(ledSmoke, OUTPUT);
   
 //  การกำหนดช่องทางในการ monitor
   Serial.begin(9600);
@@ -69,43 +75,61 @@ void loop() {
   
   if (Firebase.failed()) {
 
-    //    เมื่อไรก็ตามที่ไม่สามารถเข้า Firebase
+    //   มื่อไรก็ตามที่ไม่สามารถเข้า Firebase
     Serial.print("Connot Connected Firebase :...");
     Serial.println(Firebase.error());
     return;
     delay(myDelay);
     }
 
-    Serial.print("Success Connected Firebase Times ==>\n");
-    Serial.println(Firebase.getInt("led"));
+  Serial.print("Success Connected Firebase Times ==>\n");
+  Serial.println(Firebase.getInt("LED1"));
+  Serial.println(Firebase.getInt("LED2"));
 
-    intIndex = Firebase.getInt("index");
+  intIndex = Firebase.getInt("index");
 
-    intIndex++;
+  intIndex++;
 
-  intSwitch = Firebase.getInt("Switch1/LED1");
+  intSwitch = Firebase.getInt("LED1");
 
   if(intSwitch==0){
-    //  for myOutput
-      digitalWrite(myOutput, LOW);   // turn the LED on (HIGH is the voltage level) 
+    //  for led1
+      digitalWrite(led1, LOW);   // turn the LED on (HIGH is the voltage level) 
   }
-  else{
-      digitalWrite(myOutput, HIGH);  
-    
-    }
+  
+  else {
+      digitalWrite(led1, HIGH);  
+  }
 
-  intSwitch2 = Firebase.getInt("Switch1/LED2");
+  intSwitch2 = Firebase.getInt("LED2");
 
   if(intSwitch2==0){
-    //  for myOutput
-      digitalWrite(myOutput2, LOW);   // turn the LED on (HIGH is the voltage level) 
+    //  for led2
+      digitalWrite(led2, LOW);   // turn the LED on (HIGH is the voltage level) 
   }
-  else{
-      digitalWrite(myOutput2, HIGH);  
-    
-    }
   
-    delay(myDelay);
+  else {
+      digitalWrite(led2, HIGH);  
+    }
+    
+//------------------------------------------------------------------------------
+//  sensersmoke
+
+  int analogSensor = analogRead(smoke);
+  Firebase.setInt("SensorGas", analogSensor);
+  
+  Serial.print("Sensor : ");
+  Serial.println(analogSensor);
+  
+  if (analogSensor > sensorThres) {
+    digitalWrite(ledSmoke, HIGH);
+  }
+  
+  else {
+    digitalWrite(ledSmoke, LOW);   
+  }
+  
+  delay(myDelay);
 
 
   
